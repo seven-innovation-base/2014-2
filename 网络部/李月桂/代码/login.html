@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML4.01 Transitional//EN" "http:www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=gb2312">
+<title>User Login</title>
+<script language='Javascript' src='check_data.js'></script>
+<script language='Javascript'>
+function Check(){
+      if(document.Login.username.value==""){
+	    alert('请输入你的用户名！');
+		return false;
+	}
+	 if(document.Login.pwd.value==""){
+	    alert('请输入你的密码！');
+		return false;
+	}
+	if(document.Login.username.value。length < 2){
+        alert('用户名长度必须大于2！');
+		return false;
+	}
+	if(document.send.password.value.length< 6){
+    	alert('密码长度不足！');
+		return false;
+	}
+}
+</script>
+</head>
+<body>
+<form name="Login" method="post" action="login.php" 
+      onSubmit="return Check();">
+<table border="0" cellpadding="8"  width="350" align="center"  >
+  <tr>
+     <td colspan="2" align="center" class="alert">用户登录界面</td>
+  </tr>
+  <tr>
+  <td>用户名：</td>
+  <td><input name="username" type="text" id="username"
+      class="textinput" /></td>
+  </tr>
+   <tr>
+  <td>密码：</td>
+  <td><input name="pwd" type="password" id="pwd"
+      class="textinput" /></td>
+  </tr>
+  <tr>
+  <td>验证码:</td>
+  <td><input type="text" name="check" size="5px"><img src="showing.php"  onclick="this.src='showing.php?'+Math.random()"></img>
+  </td>
+  </tr>
+  <tr> 
+     <td colspan="2" align="center"><input type="submit" class="btn"
+	 value="登录">&nbsp;&nbsp; <input type="reset" class="btn"
+	 value="重置">&nbsp;&nbsp;<input type="button" value="注册" onclick="window.open('./register.html')"/>
+	 </td>	
+  </tr>
+</table>
+</form>
+</body>
+</html>

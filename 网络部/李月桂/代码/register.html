@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML4.01 Transitional//EN" "http:www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=gb18030">
+<title>Registering form</title>
+</head>
+<body>
+<form name="send" method="post" action="register.php"
+      onSubmit="return Check()">
+<table width="330" border="0" align="center" cellpadding="5" bgcolor="#eeeeee">
+      <font color="#FF6699">*</font>
+	  为必填项
+	  <tr>
+	      <td width="40%">用户名:</td>
+		  <td><input name="username" type="text" id="username"> <font color="#FF6699">*</font></td>
+	  </tr>
+	  <tr>
+	      <td>密码：</td>
+		  <td><input name="password" type="password" id="password"> <font color="#FF6699">*</font></td>
+	  </tr>
+	  <tr>
+	      <td>重复密码：</td>
+		  <td><input name="cpassword" type="password" id="cpassword"> <font color="#FF6699">*</font></td>
+	  </tr>
+	  <tr>
+	      <td>Email：</td>
+		  <td><input name="email" type="text" id="email"></td>
+	  </tr>
+	  <tr>
+	      <td colspan="12" align="center"><input type="submit" name="Submit" value="提交"> <input type="reset" name="reset" value="重置"></td>
+	  </tr>
+</table>
+</form>
+<script language="javascript">
+function Check()  //验证表单数据有效性的函数
+{
+    if(document.send.username.value==""){
+	    window.alert('请输入用户名！');
+		return false;
+	}
+	if(document.send.username.value。length < 2){
+    	window.alert('用户名长度必须大于2！');
+		return false;
+	}
+	if(document.send.password.value==""){
+    	alert('请输入密码！');
+		return false;
+	}
+	if(document.send.password.value != document.send.cpassword.value){
+    	alert('确认密码与密码不一致！');
+		return false;
+	}
+	if(document.send.email.value==""){
+	    alert('请输入Email！');
+		return false;
+	}
+	if(document.send.email.value.indexOf("@") == -1){
+    	alert('请输入有效的Email地址！');
+		return false;
+	}
+	if(document.send.code.value==""){
+	    alert('请输入验证码！');
+		return false;
+	}
+	return ture;
+}
+</script>
+</body>
+</html>

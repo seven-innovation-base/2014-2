@@ -1,0 +1,147 @@
+*模型一的可执行代码;
+data fun;
+input T Y a b c d;
+a1=log(a);b1=log(b);c1=log(c);d1=log(d);
+cards;
+1978 1132.62 3624.10  519.28  40.99  40152 
+1979 1146.38 4038.20  537.82  113.53 40581 
+1980 1159.93 4517.80  571.70  152.99 42361 
+1981 1175.79 4860.30  629.89  192.22 43280 
+1982 1212.33 5301.80  700.02  215.84 44706 
+1983 1866.95 5957.10  755.59  257.84 46004 
+1984  1642.86  7206.70  947.35  296.29  47597 
+1985 2004.82 8989.10  2040.79 280.51 79873 
+1986  2122.01 10201.40 2090.73 156.95  51282 
+1987 2199.35 11954.50 2140.36 212.38 52783 
+1988  2357.24 14922.30 2390.47 176.86  54334 
+1989  2664.90 16917.80 2727.40 179.41  55329 
+1990  2937.10 18598.40 2821.86 299.53  56740 
+1991  3149.48 21662.50 2990.17 240.10  88360
+1992  3483.87 26651.90 3296.91 295.15  59482 
+1993  4348.95 34650.50 4255.30 191.04  60220 
+ 
+；
+run;
+option ls=64;
+*原始变量分布的散点图;
+proc gplot data=fun;
+plot y*a=1 y*b=2 y*c=3 y*d=4/overlay;
+symbol1  v=circle i=none c=yellow;
+symbol2  v=circle i=none c=red;
+symbol3  v=circle i=none c=green;
+symbol4  v=circle i=none c=black; 
+run;
+*标准化处理后变量的相关系数举证;
+proc corr;
+var a1 b1 c1 d1;
+run;
+quit;
+*标准化处理后变量的散点图;
+proc gplot data=fun;
+plot y*a1=1 y*b1=2 y*c1=3 y*d1=4/overlay;
+symbol1 v=circle i=none c=yellow;
+symbol2 v=circle i=none c=red;
+symbol3 v=circle i=none c=green;
+symbol4 v=circle i=none c=black; 
+run;
+quit;
+*筛选变量后加入第四条MODEL语句;
+proc reg data=fun;
+*model y=a b c d a1 b1 c1 d1 /selection=stepwise;
+*model y=a b c d a1 b1 c1 d1/selection=f;
+*model y=a b c d a1 b1 c1 d1 /selection=backward;
+model y=a b1 /p r collin influence;
+* R表示作残差分析
+  COLLIN要求详细分析变量间的共线性
+  P表示由输入数据和估计模型来计算预测值
+  V要求输出这些参数估计的方差膨胀因子
+  INFLUENCE要求输出每个观测值对估计值和预测值的详细分析;
+run;
+quit;
+*与原来的曲线拟合比较;
+data funtest1;
+set fun;
+yp=-969.56691+0.08212*a+289.43460*log(b);
+run;
+proc gplot data=funtest1;
+plot y*t=1 yp*t=2/overlay;
+symbol1 v=circle i=join c=yellow;
+symbol2 v=circle i=join c=red;
+run;
+
+*用1994年和1995年的数据进行预测，在于真实值比较;
+data temp;
+input T Y a b c d;
+yp=-969.56691+0.08212*a+289.43460*log(b);
+cards;
+1994  5218.10 46532.90 5126.88 280.18  61470 
+1995  6242.20 57277.30 6038.04 369.19  62388 
+;
+proc print;
+run;
+
+*模型二的可执行代码;
+data fun;
+set fun;
+if t=1983 then delete;
+run;
+option ls=64;
+*原始变量分布的散点图;
+proc gplot data=fun;
+plot y*a=1 y*b=2 y*c=3 y*d=4/overlay;
+symbol1  v=circle i=none c=yellow;
+symbol2  v=circle i=none c=red;
+symbol3  v=circle i=none c=green;
+symbol4  v=circle i=none c=black; 
+run;
+*标准化处理后变量的相关系数举证;
+proc corr;
+var a1 b1 c1 d1;
+run;
+quit;
+*标准化处理后变量的散点图;
+proc gplot data=fun;
+plot y*a1=1 y*b1=2 y*c1=3 y*d1=4/overlay;
+symbol1 v=circle i=none c=yellow;
+symbol2 v=circle i=none c=red;
+symbol3 v=circle i=none c=green;
+symbol4 v=circle i=none c=black; 
+run;
+quit;
+*筛选变量后加入第四条MODEL语句;
+proc reg data=fun;
+model y=a b c d a1 b1 c1 d1 /selection=stepwise;
+model y=a b c d a1 b1 c1 d1/selection=f;
+model y=a b c d a1 b1 c1 d1 /selection=backward;
+model y=a b /p r collin influence;
+* R表示作残差分析
+  COLLIN要求详细分析变量间的共线性
+  P表示由输入数据和估计模型来计算预测值
+  V要求输出这些参数估计的方差膨胀因子
+  INFLUENCE要求输出每个观测值对估计值和预测值的详细分析;
+run;
+quit;
+*与原来的曲线拟合比较;
+data funtest1;
+set fun;
+yp=705.61946+0.06016*a+30.36553*b;
+run;
+proc gplot data=funtest1;
+plot y*t=1 yp*t=2/overlay;
+symbol1 v=circle i=join c=yellow;
+symbol2 v=circle i=join c=red;
+run;
+
+*用1994年和1995年的数据进行预测，在于真实值比较;
+data temp;
+input T Y a b c d;
+yp=705.61946+0.06016*a+30.36553*b;
+cards;
+1994  5218.10 46532.90 5126.88 280.18  61470 
+1995  6242.20 57277.30 6038.04 369.19  62388 
+;
+proc print;
+run;
+
+
+

@@ -1,0 +1,91 @@
+/*%let a=d:\work\。。。。;
+%let b=.txt;*/
+%let filename="F:\基地\第三次考核多个日志文件的导入\data\0AB6BBBEDFF24EC8BAAC905F45AE314C_2012-05-07_21-22-38.txt";
+libname c 'F:\基地\统计部考核\统计部\唐琪\wrok';                         /*定义逻辑库*/
+data c.qq;                                   /*数据集存储到指定*/
+infile &filename lrecl=32767 end=fend length=length encoding=utf8;
+/* LRECL是用来规定逻辑记录长度，后面的数字是用来定义读取的文件逻辑长度为多少字节的encoding了解安装的SAS系统是否支持读取UTF-8编码，否则很多数据SAS读取以后会出现乱码*/
+          if _n_=1 then do;                           /*if的转移语句*/
+	          Ltp=prxparse("/Last<=>.{1,}/");                   /*定义正则表达式*/   
+		      Stp=prxparse("/L_Start<=>.{1,}/");
+		      Tstr=prxparse("/T<=>\d{1,}/");
+		      Pstr=prxparse("/P<=>[^\[]*/");
+		      Istr=prxparse("/I<=>[^\[]*/");
+		      Ustr=prxparse("/U<=>[^\[]*/");
+		      Astr=prxparse("/A<=>\d{1,}/");
+		      Bstr=prxparse("/B<=>\d{1,}/");
+              Vstr=prxparse("/V<=>[\d{1,} *,.]*/");
+		      Wstr=prxparse("/W<=>[^\[]*/");
+		      Nstr=prxparse("/N<=>[^\[]*/");
+		      Cstr=prxparse("/C<=>[^\[]*/");
+         end;
+         retain Ltp Stp Tstr Pstr Istr Ustr Astr Bstr Vstr Wstr Nstr Cstr;  /*对变量进行值的初始化和保留到下一个迭代步*/
+	     length Ltime Time proID Inpro addr Baddr $20;                      /*定义变量的长度*/
+	     length Stime version Waddr $30;                      
+	     length name company $40;
+         length Url $100;
+	     length str $5000;
+         input str $varying. length;                    /*输入可变参数，默认长度*/
+	     if _n_=1 then do;                          
+             call prxsubstr(Ltp,str,start,length);      /*对SAS子程序进行调用*/
+                 if start gt 0 then do;
+                    Ltime=substr(str,index(str,'>')+1,5);     /*运用SUBSTR和index函数截取数据*/
+		         end;
+                 else do; Ltime="";end;
+		     retain Ltime;
+		     delete;              /*DELETE语句告诉SAS系统停止处理当前的观测值，SAS系统返回DATA步的开始处进行下一次执行*/                 
+	     end;
+	     if _n_=2 then do;
+	         call prxsubstr(Stp,str,start,length);               /*返回匹配模式的起始位置和长度*/
+                 if start gt 0 then 
+                     Stime=substr(str,index(str,'>')+1,20);
+                 else  Stime="";
+		     retain Stime;
+		     delete;
+	     end;
+             call prxsubstr(Tstr,str,start,length);
+                 if start gt 0 then 
+				     Time=scan(str,2,'>[');         /*scan函数查找特殊字符并分隔字符串*/
+             else  Time="";
+		call prxsubstr(Pstr,str,start,length);
+                 if start gt 0 then 
+                     proID=scan(str,4,'>[');
+             else  proID="";
+	    call prxsubstr(Istr,str,start,length);
+                 if start gt 0 then 
+                     Inpro=scan(str,6,'>[');
+             else  Inpro="";
+        call prxsubstr(Ustr,str,start,length);
+                 if start gt 0 then 
+                     Url=scan(str,8,'>[');
+             else  Url="";
+		call prxsubstr(Astr,str,start,length);
+                 if start gt 0 then 
+                     addr=scan(str,10,'>[');
+             else  addr="";
+		call prxsubstr(Bstr,str,start,length);
+                 if start gt 0 then 
+                     Baddr=scan(str,12,'>[');
+             else  Baddr="";
+		call prxsubstr(Vstr,str,start,length);
+                 if start gt 0 then 
+                     Version=substr(str,start+4,length-4);      /*....*/
+					                  
+             else  Version="";
+	    call prxsubstr(Wstr,str,start,length);
+                 if start gt 0 then 
+                    Waddr=scan(str,8,'>[');
+             else  Waddr="";
+	    call prxsubstr(Nstr,str,start,length);
+                 if start gt 0 then 
+                     name=scan(str,-3,'>[');
+             else  name="";
+	    call prxsubstr(Cstr,str,start,length);
+                 if start gt 0 then do;
+		             start=start+4;
+                 company=scan(str,-1,'>');
+		     end;
+             else do; company="";end;      
+           keep Ltime Stime Time proID Inpro Url addr Baddr version Waddr name company;
+	     
+         run;
